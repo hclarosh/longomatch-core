@@ -26,6 +26,8 @@ namespace LongoMatch.Services.Controller
 	[ControllerAttribute (ProjectsManagerState.NAME)]
 	public class SportsProjectsController : ProjectsController<LMProject, LMProjectVM>
 	{
+		string textFilter = string.Empty;
+
 		public new SportsProjectsManagerVM ViewModel {
 			get {
 				return (SportsProjectsManagerVM)base.ViewModel;
@@ -40,6 +42,7 @@ namespace LongoMatch.Services.Controller
 			await base.Start ();
 			App.Current.EventsBroker.SubscribeAsync<ResyncEvent> (HandleResync);
 			App.Current.EventsBroker.Subscribe<OpenEvent<LMProject>> (HandleOpen);
+			App.Current.EventsBroker.Subscribe<SearchEvent<LMProject>> (model => HandleSearch (model.TextFilter));
 		}
 
 		public override async Task Stop ()
@@ -47,6 +50,18 @@ namespace LongoMatch.Services.Controller
 			await base.Stop ();
 			App.Current.EventsBroker.UnsubscribeAsync<ResyncEvent> (HandleResync);
 			App.Current.EventsBroker.Unsubscribe<OpenEvent<LMProject>> (HandleOpen);
+		}
+
+		protected override void ConnectEvents ()
+		{
+			base.ViewModel.ViewModels.CollectionChanged += HandleLMProjectsVMCollectionChanged;
+			base.ConnectEvents ();
+		}
+
+		protected override void DisconnectEvents ()
+		{
+			base.ViewModel.ViewModels.CollectionChanged -= HandleLMProjectsVMCollectionChanged;
+			base.DisconnectEvents ();
 		}
 
 		protected override void HandleSelectionChanged (object sender, NotifyCollectionChangedEventArgs e)
@@ -78,9 +93,20 @@ namespace LongoMatch.Services.Controller
 			if (ViewModel.LoadedProject != null) {
 				// We get the selection instead of LoadedProject because it can be modified without saving.
 				// Also we don't use the selected VM directly because it's disposed on unload
-				LMProjectVM selectedVM = new LMProjectVM {Model = ViewModel.Selection.First ().Model};
+				LMProjectVM selectedVM = new LMProjectVM { Model = ViewModel.Selection.First ().Model };
 				LMStateHelper.OpenProject (selectedVM);
 			}
+		}
+
+		void HandleSearch (string text)
+		{
+			ViewModel.FilteredViewModels = new RangeObservableCollection<LMProjectVM> (ViewModel.ViewModels.Where (project => project.Model.Description.Search (text)));
+			textFilter = text;
+		}
+
+		void HandleLMProjectsVMCollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+		{
+			HandleSearch (textFilter);
 		}
 	}
 }
