@@ -21,6 +21,7 @@ using LongoMatch.Core.Events;
 using LongoMatch.Core.Store;
 using LongoMatch.Core.ViewModel;
 using VAS.Core.Common;
+using VAS.Core.Filters;
 using VAS.Core.MVVMC;
 using VAS.Core.ViewModel;
 using VAS.Services.ViewModel;
@@ -35,6 +36,7 @@ namespace LongoMatch.Services.ViewModel
 		public SportsProjectsManagerVM ()
 		{
 			ResyncCommand = new LimitationAsyncCommand (VASFeature.OpenMultiCamera.ToString (), Resync, () => LoadedProject.FileSet.Count () > 1);
+			VisibleViewModels = new VisibleRangeObservableProxy<LMProjectVM> (ViewModels);
 		}
 
 		protected override void DisposeManagedResources ()
@@ -77,6 +79,8 @@ namespace LongoMatch.Services.ViewModel
 			get;
 			set;
 		} = "";
+
+		public VisibleRangeObservableProxy<LMProjectVM> VisibleViewModels { get; set; }
 
 		[PropertyChanged.DoNotNotify]
 		public LimitationAsyncCommand ResyncCommand {

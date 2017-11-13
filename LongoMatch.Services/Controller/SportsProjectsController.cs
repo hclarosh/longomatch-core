@@ -2,7 +2,7 @@
 //  Copyright (C) 2016 Fluendo S.A.
 //
 //
-using System;
+
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +11,7 @@ using LongoMatch.Core.Store;
 using LongoMatch.Core.ViewModel;
 using LongoMatch.Services.State;
 using LongoMatch.Services.ViewModel;
-using VAS.Core.Common;
+using VAS.Core.Filters;
 using VAS.Core.Events;
 using VAS.Core.MVVMC;
 using VAS.Services.Controller;
@@ -54,13 +54,11 @@ namespace LongoMatch.Services.Controller
 
 		protected override void ConnectEvents ()
 		{
-			base.ViewModel.ViewModels.CollectionChanged += HandleLMProjectsVMCollectionChanged;
 			base.ConnectEvents ();
 		}
 
 		protected override void DisconnectEvents ()
 		{
-			base.ViewModel.ViewModels.CollectionChanged -= HandleLMProjectsVMCollectionChanged;
 			base.DisconnectEvents ();
 		}
 
@@ -100,13 +98,13 @@ namespace LongoMatch.Services.Controller
 
 		void HandleSearch (string text)
 		{
-			ViewModel.FilteredViewModels = new RangeObservableCollection<LMProjectVM> (ViewModel.ViewModels.Where (project => project.Model.Description.Search (text)));
+			foreach (var lmProjectVM in ViewModel.ViewModels) {
+				//FIXME: Move Search to Controller
+				lmProjectVM.Visible = lmProjectVM.Model.Description.Search (text);
+			}
+			ViewModel.VisibleViewModels = new VisibleRangeObservableProxy<LMProjectVM> (ViewModel.ViewModels);
 			textFilter = text;
-		}
-
-		void HandleLMProjectsVMCollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
-		{
-			HandleSearch (textFilter);
+			ViewModel.VisibleViewModels.ApplyPropertyChanges ();
 		}
 	}
 }

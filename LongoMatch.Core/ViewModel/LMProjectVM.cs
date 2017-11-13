@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using LongoMatch.Core.Store;
 using VAS.Core.Common;
+using VAS.Core.Interfaces.GUI;
 using VAS.Core.Store;
 using VAS.Core.ViewModel;
 
@@ -27,7 +28,7 @@ namespace LongoMatch.Core.ViewModel
 	/// <summary>
 	/// ViewModel for sports projects.
 	/// </summary>
-	public class LMProjectVM : ProjectVM<LMProject>
+	public class LMProjectVM : ProjectVM<LMProject>, IVisible
 	{
 		string description;
 		DateTime matchDate;
@@ -40,7 +41,10 @@ namespace LongoMatch.Core.ViewModel
 			AwayTeam = new LMTeamVM ();
 			Timeline = new LMTimelineVM (HomeTeam, AwayTeam);
 			Dashboard = new LMDashboardVM ();
+			Visible = true;
 		}
+
+		public bool Visible { get; set; }
 
 		/// <summary>
 		/// Gets the description of the project
