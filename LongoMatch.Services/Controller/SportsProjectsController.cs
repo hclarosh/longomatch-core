@@ -105,6 +105,7 @@ namespace LongoMatch.Services.Controller
 			ViewModel.VisibleViewModels = new VisibleRangeObservableProxy<LMProjectVM> (ViewModel.ViewModels);
 			textFilter = text;
 			ViewModel.VisibleViewModels.ApplyPropertyChanges ();
+			ViewModel.NoResults = !ViewModel.VisibleViewModels.Any ();
 		}
 	}
 }
