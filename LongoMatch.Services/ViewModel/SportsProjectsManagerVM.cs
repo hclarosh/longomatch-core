@@ -28,22 +28,23 @@ using VAS.Services.ViewModel;
 
 namespace LongoMatch.Services.ViewModel
 {
-	[ViewAttribute ("ProjectsManager")]
+	[ViewAttribute("ProjectsManager")]
 	public class SportsProjectsManagerVM : ProjectsManagerVM<LMProject, LMProjectVM>
 	{
 		CountLimitationBarChartVM limitationChart;
 
-		public SportsProjectsManagerVM ()
+		public SportsProjectsManagerVM()
 		{
-			ResyncCommand = new LimitationAsyncCommand (VASFeature.OpenMultiCamera.ToString (), Resync, () => LoadedProject.FileSet.Count () > 1);
-			VisibleViewModels = new VisibleRangeObservableProxy<LMProjectVM> (ViewModels);
+			ResyncCommand = new LimitationAsyncCommand(VASFeature.OpenMultiCamera.ToString(), Resync, () => LoadedProject.FileSet.Count() > 1);
+			VisibleViewModels = new VisibleRangeObservableProxy<LMProjectVM>(ViewModels);
 		}
 
-		protected override void DisposeManagedResources ()
+		protected override void DisposeManagedResources()
 		{
-			base.DisposeManagedResources ();
-			if (LimitationChart != null) {
-				LimitationChart.Dispose ();
+			base.DisposeManagedResources();
+			if (LimitationChart != null)
+			{
+				LimitationChart.Dispose();
 				LimitationChart = null;
 			}
 		}
@@ -51,12 +52,15 @@ namespace LongoMatch.Services.ViewModel
 		/// <summary>
 		/// ViewModel for the Bar chart used to display count limitations in the Limitation Widget
 		/// </summary>
-		public CountLimitationBarChartVM LimitationChart {
-			get {
+		public CountLimitationBarChartVM LimitationChart
+		{
+			get
+			{
 				return limitationChart;
 			}
 
-			set {
+			set
+			{
 				limitationChart = value;
 				Limitation = limitationChart?.Limitation;
 			}
@@ -66,7 +70,8 @@ namespace LongoMatch.Services.ViewModel
 		/// Gets or sets the type of the sort.
 		/// </summary>
 		/// <value>The type of the sort.</value>
-		public ProjectSortType SortType {
+		public ProjectSortType SortType
+		{
 			get;
 			set;
 		}
@@ -75,28 +80,38 @@ namespace LongoMatch.Services.ViewModel
 		/// Gets or sets the filter text.
 		/// </summary>
 		/// <value>The filter text.</value>
-		public string FilterText {
+		public string FilterText
+		{
 			get;
 			set;
 		} = "";
 
-		public VisibleRangeObservableProxy<LMProjectVM> VisibleViewModels { get; set; }
+		/// <summary>
+		/// Gets or sets the visible view models, viewmodels that has boolean Visible property setted to true.
+		/// </summary>
+		/// <value>The visible view models.</value>
+		public VisibleRangeObservableProxy<LMProjectVM> VisibleViewModels
+		{
+			get;
+			set;
+		}
 
 		[PropertyChanged.DoNotNotify]
-		public LimitationAsyncCommand ResyncCommand {
+		public LimitationAsyncCommand ResyncCommand
+		{
 			get;
 			protected set;
 		}
 
-		protected override async Task Open (LMProjectVM viewModel)
+		protected override async Task Open(LMProjectVM viewModel)
 		{
-			await Save (false);
-			await base.Open (viewModel);
+			await Save(false);
+			await base.Open(viewModel);
 		}
 
-		protected async Task Resync ()
+		protected async Task Resync()
 		{
-			await App.Current.EventsBroker.Publish (new ResyncEvent ());
+			await App.Current.EventsBroker.Publish(new ResyncEvent());
 		}
 	}
 }
